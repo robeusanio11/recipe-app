@@ -1,70 +1,33 @@
 import API_KEY from '../config/API_KEY.js';
-import React, { Component } from 'react';
+import APP_ID from '../config/APP_ID.js';
+import React, { useState } from 'react';
 
-export default class Home extends Component {
-  constructor (props) {
-    super(props)
+export default function Home() {
+  const [recipeList, setRecipeList] = useState([]);
+  const [recipeQuery, setRecipeQuery] = useState('');
 
-    this.state = {
-      recipeList: [],
+  const handleSearchSubmit = async function(event) {
+    event.preventDefault();
+    const res = await fetch(`https://api.edamam.com/api/recipes/v2?app_id=${APP_ID}&app_key=${API_KEY}&type=public&q=${recipeQuery}`, { method: 'GET'});
+      const results = await res.json();
+      setRecipeList(results.hits);
     };
 
-    this.handleSearchSubmit = this.handleSearchSubmit.bind(this);
-  }
-
-  handleSearchSubmit = async function(query) {
-    const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch/?apiKey=${API_KEY}&query=${query}`);
-    const results = await res.json();
-    console.log(results.results);
-    this.setState({
-      searchQuery: "",
-      recipeList: results.results,
-    });
-  }
-
-  render() {
     return (
-    <>
-      <form>
-        <input type="text" id="recipe-search" onChange={(event) => this.setState({searchQuery: event.target.value})}/>
-        <button onSubmit={this.handleSearchSubmit(this.state.searchQuery)}></button>
+      <>
+      <form onSubmit={handleSearchSubmit}>
+        <input type="text" id="recipe-search" onChange={event => setRecipeQuery(event.target.value)}/>
+        <button type="submit" value="Submit">SEARCH</button>
       </form>
 
       <ul>
-        {this.state.recipeList.map((recipe) => (
-            <li key={recipe.key}>
-              <h3>{recipe.title}</h3>
-              <img src={recipe.image}/>
+        {recipeList.map(({ recipe }) => (
+          <li key={recipe.key}>
+              <h3>{recipe.label}</h3>
+              <img src={recipe.images.THUMBNAIL.url}/>
             </li>
         ))}
       </ul>
     </>
-    )
+    );
   }
-}
-// ({recipes}) {
-//   return (
-//     <>
-//       <input type="search" id="recipe-search" onSubmit={(query) => this.}/>
-//       <ul>
-//         {recipes.results.map((recipe) => (
-//             <li key={recipe.key}>
-//               <h3>{recipe.title}</h3>
-//               <img src={recipe.image}/>
-//             </li>
-//         ))}
-//       </ul>
-//     </>
-//   )
-// }
-
-// export async function getServerSideProps(query) {
-//   const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch/?apiKey=${API_KEY}&query=${query}`);
-//   const recipes = await res.json();
-
-//   return {
-//     props: {
-//       recipes
-//     }
-//   }
-// }
