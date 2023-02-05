@@ -1,11 +1,37 @@
 import API_KEY from '../config/API_KEY.js';
+import React, { Component } from 'react';
 
-export default function Home({recipes}) {
-  return (
+export default class Home extends Component {
+  constructor (props) {
+    super(props)
+
+    this.state = {
+      recipeList: [],
+    };
+
+    this.handleSearchSubmit = this.handleSearchSubmit.bind(this);
+  }
+
+  handleSearchSubmit = async function(query) {
+    const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch/?apiKey=${API_KEY}&query=${query}`);
+    const results = await res.json();
+    console.log(results.results);
+    this.setState({
+      searchQuery: "",
+      recipeList: results.results,
+    });
+  }
+
+  render() {
+    return (
     <>
-      <input type="search" id="recipe-search"/>
+      <form>
+        <input type="text" id="recipe-search" onChange={(event) => this.setState({searchQuery: event.target.value})}/>
+        <button onSubmit={this.handleSearchSubmit(this.state.searchQuery)}></button>
+      </form>
+
       <ul>
-        {recipes.results.map((recipe) => (
+        {this.state.recipeList.map((recipe) => (
             <li key={recipe.key}>
               <h3>{recipe.title}</h3>
               <img src={recipe.image}/>
@@ -13,16 +39,32 @@ export default function Home({recipes}) {
         ))}
       </ul>
     </>
-  )
-}
-
-export async function getStaticProps() {
-  const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch/?apiKey=${API_KEY}&query=pasta`);
-  const recipes = await res.json();
-
-  return {
-    props: {
-      recipes
-    }
+    )
   }
 }
+// ({recipes}) {
+//   return (
+//     <>
+//       <input type="search" id="recipe-search" onSubmit={(query) => this.}/>
+//       <ul>
+//         {recipes.results.map((recipe) => (
+//             <li key={recipe.key}>
+//               <h3>{recipe.title}</h3>
+//               <img src={recipe.image}/>
+//             </li>
+//         ))}
+//       </ul>
+//     </>
+//   )
+// }
+
+// export async function getServerSideProps(query) {
+//   const res = await fetch(`https://api.spoonacular.com/recipes/complexSearch/?apiKey=${API_KEY}&query=${query}`);
+//   const recipes = await res.json();
+
+//   return {
+//     props: {
+//       recipes
+//     }
+//   }
+// }
