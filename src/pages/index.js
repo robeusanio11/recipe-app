@@ -1,16 +1,15 @@
 import API_KEY from '../config/API_KEY.js';
 
 export default function Home({recipes}) {
-  console.log(recipes);
   return (
     <>
-      <div>Search for Pasta Recipes:</div>
+      <input type="search" id="recipe-search"/>
       <ul>
         {recipes.results.map((recipe) => (
-          <li key={recipe.id}>
-            <h3>{recipe.title}</h3>
-            <img src={recipe.image}/>
-          </li>
+            <li key={recipe.key}>
+              <h3>{recipe.title}</h3>
+              <img src={recipe.image}/>
+            </li>
         ))}
       </ul>
     </>
